@@ -1,6 +1,7 @@
 package com.ethercamp.starter.ethereum;
 
 import org.ethereum.core.Block;
+import org.ethereum.core.TransactionExecutionSummary;
 import org.ethereum.core.TransactionReceipt;
 import org.ethereum.facade.Ethereum;
 import org.ethereum.listener.EthereumListenerAdapter;
@@ -21,7 +22,6 @@ public class EthereumListener extends EthereumListenerAdapter {
     @Override
     public void onBlock(Block block, List<TransactionReceipt> receipts) {
         System.out.println();
-        System.out.println("Do something on block: " + block.getNumber());
 
         if (syncDone)
             calcNetHashRate(block);
@@ -29,14 +29,18 @@ public class EthereumListener extends EthereumListenerAdapter {
         System.out.println();
     }
 
-
+    @Override
+    public void onTransactionExecuted(TransactionExecutionSummary summary) {
+        super.onTransactionExecuted(summary);
+        System.out.println(summary.toString());
+    }
 
     /**
      *  Mark the fact that you are touching
      *  the head of the chain
      */
     @Override
-    public void onSyncDone() {
+    public void onSyncDone(SyncState state) {
 
         System.out.println(" ** SYNC DONE ** ");
         syncDone = true;

@@ -1,5 +1,6 @@
 package com.ethercamp.starter.ethereum;
 
+import com.ethercamp.starter.contracts.EthNotary.GetDocument;
 import org.adridadou.ethereum.EthereumBackend;
 import org.adridadou.ethereum.EthereumFacade;
 import org.adridadou.ethereum.EthereumProxy;
@@ -23,7 +24,7 @@ import org.ethereum.solidity.compiler.SolidityCompiler;
 import java.math.BigInteger;
 
 
-public class EthereumBean {
+public class EthereumBlockchain {
 
     Ethereum ethereum;
     EthereumReal eth;
@@ -44,20 +45,31 @@ public class EthereumBean {
         this.ethereum.addListener(new EthereumListener(ethereum));
     }
 
-    public EthAccount createAccount(String privatehex){
+    public EthAccount getAccountFromPrivateKey(String privatehex){
         BigInteger privateKey = new BigInteger(Hex.decode(privatehex));
         ECKey key = ECKey.fromPrivate(privateKey);
         return new EthAccount(key);
+    }
+
+    public EthAddress getAddress(String address){
+        try {
+            return EthAddress.of(org.apache.commons.codec.binary.Hex.decodeHex(address.toCharArray()));
+        }catch (Exception e){
+            return null;
+        }
+    }
+
+    public Object getContract(EthAddress address, EthAccount acct,  Class<? extends Object> contractInterface){
+        return ethereumFacade.createContractProxy(address, ethereumFacade.getAbi(address), contractInterface).forAccount(acct);
     }
 
     public EthAddress deploy(String contractName, String contract, String key){
         try {
             SoliditySource contractSource = new SoliditySource(contract);
             CompiledContract compiledContract = ethereumFacade.compile(contractSource).get().get(contractName);
-            EthAddress address = ethereumFacade.publishContract(compiledContract, createAccount(key)).get();
+            EthAddress address = ethereumFacade.publishContract(compiledContract, getAccountFromPrivateKey(key)).get();
             return address;
         }catch (Exception e){
-
         }
         return null;
     }

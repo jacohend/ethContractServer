@@ -1,6 +1,6 @@
 package com.ethercamp.starter;
 
-import com.ethercamp.starter.ethereum.EthereumBean;
+import com.ethercamp.starter.ethereum.EthereumBlockchain;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,11 +10,11 @@ import java.util.concurrent.Executors;
 public class Config {
 
     @Bean
-    EthereumBean ethereumBean() throws Exception {
-        EthereumBean ethereumBean = new EthereumBean();
+    EthereumBlockchain ethereumBean() throws Exception {
+        EthereumBlockchain ethereumBlockchain = new EthereumBlockchain();
         Executors.newSingleThreadExecutor().
-                submit(ethereumBean::start);
+                submit(ethereumBlockchain::start);
 
-        return ethereumBean;
+        return ethereumBlockchain;
     }
 }
