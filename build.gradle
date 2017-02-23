@@ -21,6 +21,9 @@ repositories {
     maven {
         url "http://dl.bintray.com/ethereum/maven"
     }
+    maven {
+        url "https://dl.bintray.com/cubefriendly/maven"
+    }
 }
 
 configurations.all {
@@ -30,6 +33,7 @@ configurations.all {
 
 dependencies {
     compile ("org.springframework.boot:spring-boot-starter-web")
+    compile("org.adridadou:eth-contract-api:0.16")
 
 
     compile "com.google.guava:guava:18.0"
