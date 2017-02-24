@@ -81,4 +81,17 @@ public class GetDocument {
     public void setNowNo(Integer nowNo) {
         this.nowNo = nowNo;
     }
+
+    @Override
+    public String toString() {
+        return "GetDocument{" +
+                "title='" + title + '\'' +
+                ", cr='" + cr + '\'' +
+                ", document='" + document + '\'' +
+                ", sender='" + sender + '\'' +
+                ", time=" + time +
+                ", createdNo=" + createdNo +
+                ", nowNo=" + nowNo +
+                '}';
+    }
 }
