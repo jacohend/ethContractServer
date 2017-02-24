@@ -32,7 +32,7 @@ public class EthereumListener extends EthereumListenerAdapter {
     @Override
     public void onTransactionExecuted(TransactionExecutionSummary summary) {
         super.onTransactionExecuted(summary);
-        System.out.println(summary.toString());
+        System.out.println(summary.getTransactionHash());
     }
 
     /**

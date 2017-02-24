@@ -37,7 +37,7 @@ public class MyRestController {
         return ethereumBlockchain.deploy(contractName, contract, key).toString();
     }
 
-    @RequestMapping(value = "/contract/{contact}/account/{key}", method = POST, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/add/notary/{contact}/account/{key}", method = POST, produces = APPLICATION_JSON_VALUE)
     @ResponseBody
     public String invokeNotaryAdd(@PathVariable("key") String key, @PathVariable("contract") String contract,
                                @RequestParam("title") String title, @RequestParam("cr") String cr, @RequestParam("doc") String doc){
@@ -45,9 +45,9 @@ public class MyRestController {
         return eNC.addDocument(title, cr, doc, EthValue.wei(1000000)).toString();
     }
 
-    @RequestMapping(value = "/contract/{contact}/account/{key}", method = POST, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/get/notary/{contact}/account/{key}", method = POST, produces = APPLICATION_JSON_VALUE)
     @ResponseBody
-    public String invokeNotaryAdd(@PathVariable("key") String key, @PathVariable("contract") String contract, @RequestParam("title") String title){
+    public String invokeNotaryGet(@PathVariable("key") String key, @PathVariable("contract") String contract, @RequestParam("title") String title){
         EthNotaryControl eNC = new EthNotaryControl(key, contract);
         return eNC.getDocument(title).toString();
     }
