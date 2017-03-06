@@ -21,18 +21,11 @@ public class EthereumListener extends EthereumListenerAdapter {
 
     @Override
     public void onBlock(Block block, List<TransactionReceipt> receipts) {
-        System.out.println();
-
-        if (syncDone)
-            calcNetHashRate(block);
-
-        System.out.println();
     }
 
     @Override
     public void onTransactionExecuted(TransactionExecutionSummary summary) {
         super.onTransactionExecuted(summary);
-        System.out.println(summary.getTransactionHash());
     }
 
     /**
@@ -75,4 +68,19 @@ public class EthereumListener extends EthereumListenerAdapter {
 
     }
 
+    public Ethereum getEthereum() {
+        return ethereum;
+    }
+
+    public void setEthereum(Ethereum ethereum) {
+        this.ethereum = ethereum;
+    }
+
+    public boolean isSyncDone() {
+        return syncDone;
+    }
+
+    public void setSyncDone(boolean syncDone) {
+        this.syncDone = syncDone;
+    }
 }

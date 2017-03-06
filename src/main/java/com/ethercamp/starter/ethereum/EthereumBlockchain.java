@@ -1,6 +1,5 @@
 package com.ethercamp.starter.ethereum;
 
-import com.ethercamp.starter.contracts.EthNotary.GetDocument;
 import org.adridadou.ethereum.EthereumBackend;
 import org.adridadou.ethereum.EthereumFacade;
 import org.adridadou.ethereum.EthereumProxy;
@@ -10,18 +9,18 @@ import org.adridadou.ethereum.ethj.EthereumReal;
 import org.adridadou.ethereum.ethj.EthereumTest;
 import org.adridadou.ethereum.event.EthereumEventHandler;
 import org.adridadou.ethereum.swarm.SwarmService;
-import org.adridadou.ethereum.values.CompiledContract;
-import org.adridadou.ethereum.values.EthAccount;
-import org.adridadou.ethereum.values.EthAddress;
-import org.adridadou.ethereum.values.SoliditySource;
+import org.adridadou.ethereum.values.*;
 import org.bouncycastle.util.encoders.Hex;
 import org.ethereum.core.Account;
+import org.ethereum.core.Transaction;
 import org.ethereum.crypto.ECKey;
 import org.ethereum.facade.Ethereum;
 import org.ethereum.facade.EthereumFactory;
 import org.ethereum.solidity.compiler.SolidityCompiler;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 
 
 public class EthereumBlockchain {
@@ -33,6 +32,7 @@ public class EthereumBlockchain {
     private EthereumEventHandler handler;
     private EthereumProxy bcProxy;
     private EthereumFacade ethereumFacade;
+    private EthereumListener listener;
 
     public void start(){
         this.ethereum = EthereumFactory.createEthereum();
@@ -42,7 +42,8 @@ public class EthereumBlockchain {
         handler = new EthereumEventHandler();
         bcProxy = new EthereumProxy(eth, handler, inputTypeHandler, outputTypeHandler);
         ethereumFacade = new EthereumFacade(bcProxy, inputTypeHandler, outputTypeHandler, SwarmService.from(SwarmService.PUBLIC_HOST), SolidityCompiler.getInstance());
-        this.ethereum.addListener(new EthereumListener(ethereum));
+        listener = new EthereumListener(ethereum);
+        this.ethereum.addListener(listener);
     }
 
     public EthAccount getAccountFromPrivateKey(String privatehex){
@@ -57,6 +58,16 @@ public class EthereumBlockchain {
         }catch (Exception e){
             return null;
         }
+    }
+
+    public EthAccount newAccount(){
+        ECKey key = new ECKey();
+        EthAccount acct = new EthAccount(key);
+        return acct;
+    }
+
+    public EthValue getBalance(String address){
+        return ethereumFacade.getBalance(getAddress(address));
     }
 
     public Object getContract(EthAddress address, EthAccount acct,  Class<? extends Object> contractInterface){
@@ -74,7 +85,46 @@ public class EthereumBlockchain {
         return null;
     }
 
+    public String sendTx(String fromKey, String to, EthValue value){
+        try {
+            return ethereumFacade.sendEther(getAccountFromPrivateKey(fromKey), getAddress(to), value).get().getResult().toString();
+        }catch (Exception e){
+            return "";
+        }
+    }
+
+    public Boolean isPending(String txHash){
+        for (Transaction tx : ethereum.getPendingStateTransactions()){
+            if (Hex.toHexString(tx.getHash()).equals(txHash)){
+                return true;
+            }
+        }
+        for (Transaction tx : ethereum.getWireTransactions()){
+            if (Hex.toHexString(tx.getHash()).equals(txHash)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Transaction findTx(String txHash, long blocksBackwards){
+        long blockNumber = ethereum.getBlockchain().getBestBlock().getNumber();
+        for (long i = blockNumber; i> i-blocksBackwards; i--){
+            List<Transaction> txList = ethereum.getBlockchain().getBlockByNumber(i).getTransactionsList();
+            if (txList.size() > 0){
+                for (Transaction tx : txList){
+                    if (Hex.toHexString(tx.getHash()).equals(txHash)){
+                        return tx;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public String getBestBlock(){
         return "" + ethereum.getBlockchain().getBestBlock().getNumber();
     }
+
+    public Boolean isSynced(){return listener.isSyncDone();}
 }
